@@ -18,6 +18,7 @@ export class GameState {
         this.totalDataGenerated = 0;
         this.totalDataLost = 0;
         this.prestigeCount = 0;
+        this.nodesPlaced = 0; // Compte le nombre de nœuds placés (pour inflation)
 
         // Réseau
         this.nodes = [];
@@ -31,7 +32,8 @@ export class GameState {
             offlineRate: 0,
             coreProduction: 0,
             processorProduction: 0,
-            nodeDiscount: 0
+            nodeDiscount: 0,
+            inflationReduction: 0
         };
 
         // État du jeu
@@ -66,11 +68,22 @@ export class GameState {
         }
     }
 
-    // Calcule le coût d'un nœud avec les upgrades
+    // Calcule le coût d'un nœud avec les upgrades et l'inflation
     getNodeCost(nodeType) {
         const baseCost = NODE_TYPES[nodeType].cost;
+
+        // Rabais de l'upgrade
         const discount = this.permanentUpgrades.nodeDiscount * 0.05; // 5% par niveau
-        return Math.ceil(baseCost * (1 - discount));
+
+        // Inflation : 10% de base par nœud, réduit par l'upgrade
+        const baseInflation = 0.10; // 10%
+        const inflationReduction = this.permanentUpgrades.inflationReduction * 0.01; // 1% par niveau
+        const inflation = Math.max(baseInflation - inflationReduction, 0);
+
+        // Coût = baseCost * (1 - discount) * (1 + inflation) ^ nodesPlaced
+        const cost = baseCost * (1 - discount) * Math.pow(1 + inflation, this.nodesPlaced);
+
+        return Math.ceil(cost);
     }
 
     // Met à jour le jeu (appelé chaque tick)
@@ -185,6 +198,9 @@ export class GameState {
         this.data = CONFIG.INITIAL_DATA;
         this.integrity = CONFIG.INITIAL_INTEGRITY;
 
+        // Réinitialise l'inflation
+        this.nodesPlaced = 0;
+
         // Garde seulement le Core
         const core = this.nodes.find(n => n.type === 'CORE');
         this.nodes = [core];
@@ -272,8 +288,11 @@ export class GameState {
 
         this.nodes.push(node);
 
-        // Déduit le coût (avec rabais)
+        // Déduit le coût (avec rabais et inflation)
         this.data -= nodeCost;
+
+        // Incrémente le compteur pour l'inflation
+        this.nodesPlaced++;
 
         // Crée automatiquement des connexions avec les nœuds proches
         this.autoConnectNode(node);
@@ -427,6 +446,9 @@ export class GameState {
         this.data = CONFIG.INITIAL_DATA;
         this.integrity = CONFIG.INITIAL_INTEGRITY;
 
+        // Réinitialise l'inflation
+        this.nodesPlaced = 0;
+
         // Garde seulement le Core
         const core = this.nodes.find(n => n.type === 'CORE');
         this.nodes = [core];
@@ -471,6 +493,7 @@ export class GameState {
             totalDataGenerated: this.totalDataGenerated,
             totalDataLost: this.totalDataLost,
             prestigeCount: this.prestigeCount,
+            nodesPlaced: this.nodesPlaced,
             nodes: this.nodes.map(n => n.serialize()),
             unlockedModules: this.unlockedModules,
             permanentUpgrades: this.permanentUpgrades,
@@ -519,8 +542,15 @@ export class GameState {
             this.totalDataGenerated = data.totalDataGenerated;
             this.totalDataLost = data.totalDataLost;
             this.prestigeCount = data.prestigeCount;
+            this.nodesPlaced = data.nodesPlaced || 0;
             this.unlockedModules = data.unlockedModules || [];
-            this.permanentUpgrades = data.permanentUpgrades || { offlineRate: 0 };
+            this.permanentUpgrades = data.permanentUpgrades || {
+                offlineRate: 0,
+                coreProduction: 0,
+                processorProduction: 0,
+                nodeDiscount: 0,
+                inflationReduction: 0
+            };
             this.gameTime = data.gameTime;
 
             // Recrée les nœuds

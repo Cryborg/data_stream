@@ -213,6 +213,15 @@ export const PERMANENT_UPGRADES = {
         baseCost: 10,
         costIncrease: 1.6,
         maxLevel: 10
+    },
+    inflationReduction: {
+        name: 'Contrôle d\'Inflation',
+        description: 'Réduit l\'inflation des coûts de 1% par niveau',
+        baseDescription: 'Base: coûts augmentent de 10% par nœud placé',
+        icon: '📉',
+        baseCost: 8,
+        costIncrease: 1.5,
+        maxLevel: 10
     }
 };
 

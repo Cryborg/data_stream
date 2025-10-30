@@ -215,10 +215,13 @@ class Game {
 
         const config = NODE_TYPES[nodeType];
 
+        // Calcule le coût réel avec inflation
+        const actualCost = this.gameState.getNodeCost(nodeType);
+
         document.getElementById('nodeInfoIcon').textContent = config.icon;
         document.getElementById('nodeInfoName').textContent = config.name;
         document.getElementById('nodeInfoDescription').textContent = config.description;
-        document.getElementById('nodeInfoCost').textContent = `${config.cost} Data`;
+        document.getElementById('nodeInfoCost').textContent = `${actualCost} Data`;
 
         // Bandwidth
         if (config.bandwidthCost > 0) {
@@ -499,6 +502,16 @@ class Game {
             `${this.gameState.integrity.toFixed(1)}%`;
         document.getElementById('fragmentsAmount').textContent =
             this.gameState.consciousnessFragments.toFixed(0);
+
+        // Met à jour les coûts des nœuds (avec inflation)
+        document.querySelectorAll('.node-button').forEach(button => {
+            const nodeType = button.dataset.nodeType;
+            const cost = this.gameState.getNodeCost(nodeType);
+            const costSpan = button.querySelector('.cost');
+            if (costSpan) {
+                costSpan.textContent = `${cost} Data`;
+            }
+        });
 
         // Stats
         document.getElementById('nodeCount').textContent = this.gameState.nodes.length;

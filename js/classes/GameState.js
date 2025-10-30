@@ -4,6 +4,7 @@
 import { CONFIG, NODE_TYPES } from '../config.js';
 import { Node } from './Node.js';
 import { Connection } from './Connection.js';
+import { calculateDistance, isHubNode, canNodesConnect, CONSTANTS } from '../utils.js';
 
 export class GameState {
     constructor() {
@@ -235,10 +236,8 @@ export class GameState {
 
         // Vérifie la distance minimum avec les autres nœuds
         const canPlace = this.nodes.every(n => {
-            const dx = x - n.x;
-            const dy = y - n.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            return distance >= 50;
+            const distance = calculateDistance({x, y}, n);
+            return distance >= CONSTANTS.MIN_NODE_DISTANCE;
         });
 
         if (!canPlace) {
@@ -246,14 +245,12 @@ export class GameState {
         }
 
         // Règle spéciale : deux Routers ne peuvent pas se connecter entre eux
-        // S'ils sont assez proches pour se connecter (200px), c'est interdit
+        // S'ils sont assez proches pour se connecter, c'est interdit
         if (type === 'ROUTER') {
             const tooCloseToRouter = this.nodes.some(n => {
                 if (n.type !== 'ROUTER') return false;
-                const dx = x - n.x;
-                const dy = y - n.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                return distance < 200; // Distance de connexion automatique
+                const distance = calculateDistance({x, y}, n);
+                return distance < CONSTANTS.MAX_CONNECTION_DISTANCE;
             });
 
             if (tooCloseToRouter) {
@@ -262,18 +259,14 @@ export class GameState {
         }
 
         // Vérifie qu'au moins une connexion sera créée
-        const MAX_CONNECTION_DISTANCE = 200;
         const canConnectToAny = this.nodes.some(n => {
-            const dx = x - n.x;
-            const dy = y - n.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
+            const distance = calculateDistance({x, y}, n);
 
             // Distance OK ?
-            if (distance > MAX_CONNECTION_DISTANCE) return false;
+            if (distance > CONSTANTS.MAX_CONNECTION_DISTANCE) return false;
 
             // Règle : au moins un des deux doit être PROCESSOR ou CORE
-            return (type === 'PROCESSOR' || type === 'CORE' ||
-                    n.type === 'PROCESSOR' || n.type === 'CORE');
+            return canNodesConnect(type, n.type);
         });
 
         if (!canConnectToAny) {
@@ -302,31 +295,17 @@ export class GameState {
 
     // Connecte automatiquement un nœud aux nœuds proches
     autoConnectNode(newNode) {
-        const MAX_CONNECTION_DISTANCE = 200; // Distance max pour connexion auto
-        const MAX_CONNECTIONS_PER_NODE = 3;  // Max 3 connexions par nœud
-
-        // Règle : seuls les Processors (et Core) peuvent se connecter entre eux
-        // Les autres types ne peuvent se connecter qu'à des Processors/Core
-        const canConnectTo = (nodeA, nodeB) => {
-            const typeA = nodeA.type;
-            const typeB = nodeB.type;
-
-            // Au moins un des deux doit être PROCESSOR ou CORE
-            return (typeA === 'PROCESSOR' || typeA === 'CORE' ||
-                    typeB === 'PROCESSOR' || typeB === 'CORE');
-        };
-
         // Trouve les nœuds dans le rayon
         const nearbyNodes = this.nodes
             .filter(n => n.id !== newNode.id)
-            .filter(n => canConnectTo(newNode, n)) // Filtre selon les règles de connexion
+            .filter(n => canNodesConnect(newNode.type, n.type)) // Filtre selon les règles de connexion
             .map(n => ({
                 node: n,
                 distance: newNode.distanceTo(n)
             }))
-            .filter(item => item.distance <= MAX_CONNECTION_DISTANCE)
+            .filter(item => item.distance <= CONSTANTS.MAX_CONNECTION_DISTANCE)
             .sort((a, b) => a.distance - b.distance)
-            .slice(0, MAX_CONNECTIONS_PER_NODE);
+            .slice(0, CONSTANTS.MAX_CONNECTIONS_PER_NODE);
 
         // Crée les connexions
         nearbyNodes.forEach(item => {
@@ -575,8 +554,8 @@ export class GameState {
             const lastSave = data.lastSaveTime || now;
             const offlineTime = now - lastSave;
 
-            // Minimum 1 minute offline pour avoir des gains
-            if (offlineTime > 60000) {
+            // Minimum temps offline pour avoir des gains
+            if (offlineTime > CONSTANTS.OFFLINE_MIN_TIME) {
                 const offlineGains = this.calculateOfflineGains(offlineTime);
                 this.data += offlineGains;
 

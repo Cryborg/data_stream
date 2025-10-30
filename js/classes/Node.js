@@ -2,6 +2,7 @@
 // Principe SOLID : Single Responsibility (gère uniquement l'état d'un nœud)
 
 import { NODE_TYPES } from '../config.js';
+import { calculateDistance, CONSTANTS } from '../utils.js';
 
 export class Node {
     static nextId = 0;
@@ -163,17 +164,13 @@ export class Node {
 
     // Calcule la distance vers un autre nœud
     distanceTo(otherNode) {
-        const dx = this.x - otherNode.x;
-        const dy = this.y - otherNode.y;
-        return Math.sqrt(dx * dx + dy * dy);
+        return calculateDistance(this, otherNode);
     }
 
     // Vérifie si ce nœud peut être placé (collision)
-    canPlaceAt(x, y, existingNodes, minDistance = 50) {
+    canPlaceAt(x, y, existingNodes, minDistance = CONSTANTS.MIN_NODE_DISTANCE) {
         return existingNodes.every(node => {
-            const dx = x - node.x;
-            const dy = y - node.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
+            const distance = calculateDistance({x, y}, node);
             return distance >= minDistance;
         });
     }

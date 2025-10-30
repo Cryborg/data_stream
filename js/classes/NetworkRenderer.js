@@ -2,6 +2,7 @@
 // Principe SOLID : Single Responsibility (gère uniquement le rendu)
 
 import { CONFIG, NODE_TYPES } from '../config.js';
+import { calculateDistance, canNodesConnect, CONSTANTS } from '../utils.js';
 
 export class NetworkRenderer {
     constructor(canvas) {
@@ -287,29 +288,23 @@ export class NetworkRenderer {
     checkCanPlace(gameState, x, y) {
         const type = gameState.selectedNodeType;
 
-        // Vérifie la distance minimum avec les autres nœuds (50px)
+        // Vérifie la distance minimum avec les autres nœuds
         const minDistanceOk = gameState.nodes.every(node => {
-            const dx = x - node.x;
-            const dy = y - node.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            return distance >= 50;
+            const distance = calculateDistance({x, y}, node);
+            return distance >= CONSTANTS.MIN_NODE_DISTANCE;
         });
 
         if (!minDistanceOk) return false;
 
-        // Vérifie qu'au moins une connexion sera possible (200px)
-        const MAX_CONNECTION_DISTANCE = 200;
+        // Vérifie qu'au moins une connexion sera possible
         const canConnect = gameState.nodes.some(node => {
-            const dx = x - node.x;
-            const dy = y - node.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
+            const distance = calculateDistance({x, y}, node);
 
             // Distance OK ?
-            if (distance > MAX_CONNECTION_DISTANCE) return false;
+            if (distance > CONSTANTS.MAX_CONNECTION_DISTANCE) return false;
 
             // Règle : au moins un des deux doit être PROCESSOR ou CORE
-            return (type === 'PROCESSOR' || type === 'CORE' ||
-                    node.type === 'PROCESSOR' || node.type === 'CORE');
+            return canNodesConnect(type, node.type);
         });
 
         if (!canConnect) return false;
@@ -318,10 +313,8 @@ export class NetworkRenderer {
         if (type === 'ROUTER') {
             const tooCloseToRouter = gameState.nodes.some(n => {
                 if (n.type !== 'ROUTER') return false;
-                const dx = x - n.x;
-                const dy = y - n.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                return distance < MAX_CONNECTION_DISTANCE;
+                const distance = calculateDistance({x, y}, n);
+                return distance < CONSTANTS.MAX_CONNECTION_DISTANCE;
             });
 
             if (tooCloseToRouter) return false;
@@ -333,9 +326,7 @@ export class NetworkRenderer {
     // Trouve le nœud sous la souris
     getNodeAtPosition(nodes, x, y) {
         return nodes.find(node => {
-            const dx = x - node.x;
-            const dy = y - node.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
+            const distance = calculateDistance({x, y}, node);
             return distance <= CONFIG.NODE_RADIUS + 5;
         });
     }

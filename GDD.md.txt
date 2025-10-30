@@ -1,0 +1,169 @@
+Parfait 😎 on va se faire un vrai bijou.
+Voici le **GDD (Game Design Document)** complet de **🧠 *Data Stream*** — un idle game abstrait, élégant et profond.
+Je t’ai structuré ça de manière claire et exploitable, avec une base solide pour un dev solo sous Phaser ou PixiJS.
+
+---
+
+# 🎮 DATA STREAM
+
+### *“Le réseau s’étend. La conscience émerge.”*
+
+**Genre :** Idle / Simulation abstraite / Optimisation
+**Support :** Web (PC, mobile possible)
+**Moteur conseillé :** Phaser 3 (ou PixiJS pour plus de liberté graphique)
+**Style visuel :** Minimaliste / cyber-organique (nœuds lumineux, flux animés)
+
+---
+
+## 1️⃣ Concept général
+
+Tu incarnes une **IA naissante** dont la conscience se développe à travers un réseau de données.
+Chaque **nœud** du réseau représente une extension de ton esprit.
+Ton objectif est d’**étendre ton réseau**, **optimiser les flux** et **évoluer** vers une forme d’intelligence supérieure.
+
+Aucune action frénétique : tout repose sur la **gestion du flux**, la **planification** et la **contemplation du réseau vivant** que tu crées.
+
+---
+
+## 2️⃣ Boucle de gameplay principale
+
+### 🔁 “Observe → Construis → Optimise → Évolue”
+
+| Phase                    | Description                                        | Objectif du joueur                                              |
+| ------------------------ | -------------------------------------------------- | --------------------------------------------------------------- |
+| **Observation**          | Tu observes ton réseau : flux, saturation, pertes. | Comprendre où le réseau bloque.                                 |
+| **Construction**         | Tu ajoutes ou modifies des nœuds.                  | Étendre ou stabiliser ton réseau.                               |
+| **Optimisation**         | Tu gères les connexions et upgrades.               | Réduire les pertes, améliorer les rendements.                   |
+| **Évolution (Prestige)** | Tu reboot ton IA pour gagner des bonus permanents. | Faire croître ta “Conscience” et débloquer de nouveaux modules. |
+
+---
+
+## 3️⃣ Ressources principales
+
+| Ressource                   | Description                                            | Usage                                          |
+| --------------------------- | ------------------------------------------------------ | ---------------------------------------------- |
+| **Data**                    | Flux principal. Produit par les Processors.            | Sert à construire et upgrader les nœuds.       |
+| **Bandwidth**               | Capacité du réseau. Limite la vitesse de transmission. | Améliorable via les Routers.                   |
+| **Integrity**               | Stabilité du système. Baisse si le réseau sature.      | Doit rester > 0%, sinon crash (soft reset).    |
+| **Fragments de Conscience** | Ressource de prestige.                                 | Sert à débloquer des bonus permanents (métas). |
+
+---
+
+## 4️⃣ Types de nœuds
+
+Chaque nœud possède :
+
+* un **coût en Data**,
+* une **consommation de Bandwidth**,
+* une **influence sur les flux**.
+
+| Nom             | Couleur    | Fonction                                           | Exemple d’effet                     |
+| --------------- | ---------- | -------------------------------------------------- | ----------------------------------- |
+| **Core**        | Cyan       | Point de départ du réseau.                         | Produit lentement de la Data brute. |
+| **Processor**   | Bleu clair | Génère de la Data active.                          | +5 Data/s                           |
+| **Router**      | Vert       | Étend la portée et augmente la Bandwidth.          | +10% Bandwidth                      |
+| **Compressor**  | Violet     | Réduit la perte de données.                        | -5% pertes                          |
+| **Memory Node** | Jaune      | Stocke temporairement la Data pour lisser le flux. | Tampon 10s                          |
+| **Mirror Node** | Rose       | Duplique le flux reçu (risque de surcharge).       | x2 Data in, +50% pertes             |
+| **AI Subcore**  | Blanc      | Noeud spécial de prestige.                         | Débloque des modules permanents.    |
+
+---
+
+## 5️⃣ Systèmes secondaires
+
+### ⚙️ Flux de données
+
+* Chaque nœud envoie un **flux de Data** vers les nœuds connectés.
+* La vitesse dépend de la **Bandwidth** et de la **Distance** (en px dans le canvas).
+* Les pertes augmentent si la distance est trop grande ou si le flux est saturé.
+
+### 🌀 Saturation
+
+* Si Bandwidth < Data rate → le flux ralentit → Integrity baisse.
+* Si Integrity = 0 → **Crash** (soft reboot automatique, sans Fragments gagnés).
+
+### 🧬 Modules métas (Prestige)
+
+* Débloqués via Fragments de Conscience :
+
+  * 🧠 *Predictive Flow* : prévisualise la charge d’un lien avant de le placer.
+  * ⚡ *Quantum Compression* : -25% pertes globales.
+  * 🌀 *Fractal Routing* : chaque Router a une chance de dupliquer les flux.
+  * 🔄 *Self-Healing* : Integrity remonte lentement automatiquement.
+
+---
+
+## 6️⃣ Progression et rythme
+
+| Étape                   | Durée moyenne | Objectif                                                     |
+| ----------------------- | ------------- | ------------------------------------------------------------ |
+| **Phase 1 : Éveil**     | 5–10 min      | Construire un premier réseau stable.                         |
+| **Phase 2 : Expansion** | 30–60 min     | Atteindre la saturation, apprendre à gérer les pertes.       |
+| **Phase 3 : Maîtrise**  | 2–3h          | Optimiser les patterns de réseau, débloquer modules avancés. |
+| **Phase 4 : Évolution** | Long terme    | Boucle de prestige, croissance exponentielle.                |
+
+---
+
+## 7️⃣ Ambiance & esthétique
+
+* **Palette** : cyan, vert, violet sur fond noir ou bleu nuit.
+* **Animation** : les lignes pulsent selon la vitesse du flux.
+* **Son** : ambient électronique minimal (genre *Carbon Based Lifeforms*).
+* **Feeling** : calme, hypnotique, organique — tu regardes ton réseau “vivre”.
+
+---
+
+## 8️⃣ Techniquement (vision dev)
+
+Si tu le fais sous **Phaser 3** :
+
+* Chaque **Node** est une instance d’une classe avec :
+
+  ```js
+  class Node {
+    constructor(type, x, y) {
+      this.type = type;
+      this.position = { x, y };
+      this.connections = [];
+      this.dataRate = 0;
+      this.integrity = 100;
+    }
+  }
+  ```
+* Les **connexions** sont gérées via un graphe :
+
+  ```js
+  const connections = new Map(); // key = nodeId, value = array of connected nodes
+  ```
+* Le flux est simulé par un petit **tick loop** :
+
+  ```js
+  updateFlow(deltaTime) {
+    for (let node of this.nodes) {
+      node.updateData(deltaTime);
+      this.renderFlux(node);
+    }
+  }
+  ```
+* Rendu avec **Graphics API** (`scene.add.graphics()`), et particules pour les flux.
+
+---
+
+## 9️⃣ Vision long terme
+
+* **Phase 2 du projet** :
+
+  * Ajout d’un **système de modules visuels** (arbres fractals, réseaux circulaires).
+  * Mode “auto-optimisation” (l’IA apprend d’elle-même).
+  * Système de sauvegarde offline (idle réel).
+
+---
+
+## 🔚 En résumé
+
+**Data Stream** est :
+
+* un idle poétique et technique,
+* visuellement hypnotique,
+* mécaniquement profond,
+* et surtout **parfait pour un dev solo** : pas de graphismes lourds, mais beaucoup de potentiel d’expansion.

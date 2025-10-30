@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧠 Data Stream - Network Evolution Simulator</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Script d'intégration avec l'arcade (bouton retour) -->
+    <script src="../../arcade-theme-integration.js"></script>
+</head>
+<body>
+    <!-- Container principal -->
+    <div class="game-container">
+
+        <!-- Header avec titre et ressources -->
+        <header class="game-header">
+            <div class="title">
+                <h1>🧠 DATA STREAM</h1>
+                <p class="subtitle">"Le réseau s'étend. La conscience émerge."</p>
+            </div>
+
+            <div class="resources">
+                <div class="resource data">
+                    <span class="label">Data:</span>
+                    <span class="value" id="dataAmount">10.0</span>
+                </div>
+                <div class="resource bandwidth">
+                    <span class="label">Bandwidth:</span>
+                    <span class="value" id="bandwidthAmount">100 / 0</span>
+                </div>
+                <div class="resource integrity">
+                    <span class="label">Integrity:</span>
+                    <span class="value" id="integrityAmount">100.0%</span>
+                    <div class="integrity-bar">
+                        <div class="integrity-bar-fill"></div>
+                    </div>
+                </div>
+                <div class="resource fragments">
+                    <span class="label">Conscience:</span>
+                    <span class="value" id="fragmentsAmount">0</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Zone principale : Canvas + Panneau latéral -->
+        <div class="main-area">
+
+            <!-- Canvas du réseau -->
+            <div class="canvas-container">
+                <canvas id="gameCanvas"></canvas>
+                <div class="canvas-overlay">
+                    <div class="controls">
+                        <button id="pauseBtn" class="control-btn">⏸ Pause</button>
+                        <button id="saveBtn" class="control-btn">💾 Save</button>
+                    </div>
+
+                    <!-- Panneau d'aide pour le nœud sélectionné -->
+                    <div id="nodeInfoPanel" class="node-info-panel hidden">
+                        <div class="node-info-header">
+                            <span class="node-info-icon" id="nodeInfoIcon">◆</span>
+                            <h3 id="nodeInfoName">Processor</h3>
+                        </div>
+                        <p class="node-info-description" id="nodeInfoDescription">Description du nœud</p>
+                        <div class="node-info-stats">
+                            <div class="node-info-stat">
+                                <span class="stat-label">Coût:</span>
+                                <span class="stat-value" id="nodeInfoCost">10 Data</span>
+                            </div>
+                            <div class="node-info-stat" id="nodeInfoBandwidth">
+                                <span class="stat-label">Bandwidth:</span>
+                                <span class="stat-value" id="nodeInfoBandwidthValue">-5</span>
+                            </div>
+                            <div class="node-info-stat" id="nodeInfoEffect">
+                                <span class="stat-label">Effet:</span>
+                                <span class="stat-value" id="nodeInfoEffectValue">+5 Data/s</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="message" class="message"></div>
+                </div>
+            </div>
+
+            <!-- Panneau latéral -->
+            <aside class="sidebar">
+
+                <!-- Section: Nœuds -->
+                <section class="panel">
+                    <div class="panel-header">
+                        <h2>⬢ Nœuds</h2>
+                        <button id="toggleNodeHelp" class="help-toggle active" title="Activer/Désactiver l'aide">?</button>
+                    </div>
+                    <p class="help-text">Clique sur un bouton, puis sur le canvas pour placer.</p>
+                    <div id="nodeButtons" class="node-buttons"></div>
+                </section>
+
+                <!-- Section: Statistiques -->
+                <section class="panel stats">
+                    <h2>📊 Statistiques</h2>
+                    <div class="stat-row">
+                        <span>Nœuds:</span>
+                        <span id="nodeCount">1</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Connexions:</span>
+                        <span id="connectionCount">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Data générée:</span>
+                        <span id="dataGenerated">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Data perdue:</span>
+                        <span id="dataLost">0</span>
+                    </div>
+                </section>
+
+                <!-- Section: Prestige -->
+                <section class="panel prestige">
+                    <h2>🌀 Évolution</h2>
+                    <button id="prestigeBtn" class="prestige-main-btn">
+                        Prestige<br>
+                        <small>(1000 Data requis)</small>
+                    </button>
+
+                    <button id="upgradesBtn" class="upgrades-btn">
+                        💎 Upgrades Permanents
+                    </button>
+
+                    <h3>Modules débloqués</h3>
+                    <div id="prestigeModules" class="prestige-modules"></div>
+                </section>
+
+                <!-- Section: Aide -->
+                <section class="panel help">
+                    <h2>❓ Aide</h2>
+                    <ul>
+                        <li><strong>Clic gauche:</strong> Placer un nœud</li>
+                        <li><strong>Clic droit:</strong> Annuler / Supprimer</li>
+                        <li><strong>Espace:</strong> Pause</li>
+                        <li><strong>Ctrl+S:</strong> Sauvegarder</li>
+                    </ul>
+                    <p style="margin-top: 1rem; font-size: 0.85rem; color: #64b5f6;">
+                        💡 Les nœuds se connectent automatiquement s'ils sont proches !
+                    </p>
+
+                    <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                        <p style="font-size: 0.75rem; color: #888; margin-bottom: 0.5rem;">🛠️ Debug</p>
+                        <button id="resetBtn" class="reset-button">Réinitialiser la progression</button>
+                    </div>
+                </section>
+
+            </aside>
+
+        </div>
+
+    </div>
+
+    <!-- Modale de Prestige -->
+    <div id="prestigeModal" class="prestige-modal hidden">
+        <div class="prestige-modal-content">
+            <div class="prestige-modal-header">
+                <h2>🌀 Évolution du Réseau</h2>
+            </div>
+            <div class="prestige-modal-body">
+                <p class="prestige-warning">Tu vas redémarrer ton réseau et perdre tous tes nœuds.</p>
+                <div class="prestige-reward">
+                    <div class="prestige-reward-icon">✨</div>
+                    <div class="prestige-reward-text">
+                        <span class="prestige-reward-label">Tu vas gagner</span>
+                        <span class="prestige-reward-amount" id="prestigeRewardAmount">0</span>
+                        <span class="prestige-reward-label">Fragments de Conscience</span>
+                    </div>
+                </div>
+                <p class="prestige-info">Ces Fragments te permettront de débloquer des bonus permanents.</p>
+            </div>
+            <div class="prestige-modal-footer">
+                <button id="prestigeCancelBtn" class="prestige-modal-btn cancel">Annuler</button>
+                <button id="prestigeConfirmBtn" class="prestige-modal-btn confirm">Évoluer 🚀</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modale d'alerte générique -->
+    <div id="alertModal" class="generic-modal hidden">
+        <div class="generic-modal-content alert-style">
+            <div class="generic-modal-icon" id="alertIcon">⚠️</div>
+            <div class="generic-modal-header">
+                <h2 id="alertTitle">Alerte</h2>
+            </div>
+            <div class="generic-modal-body">
+                <p id="alertMessage">Message</p>
+            </div>
+            <div class="generic-modal-footer">
+                <button id="alertOkBtn" class="generic-modal-btn confirm">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modale de confirmation générique -->
+    <div id="confirmModal" class="generic-modal hidden">
+        <div class="generic-modal-content confirm-style">
+            <div class="generic-modal-icon" id="confirmIcon">❓</div>
+            <div class="generic-modal-header">
+                <h2 id="confirmTitle">Confirmation</h2>
+            </div>
+            <div class="generic-modal-body">
+                <p id="confirmMessage">Message</p>
+            </div>
+            <div class="generic-modal-footer">
+                <button id="confirmCancelBtn" class="generic-modal-btn cancel">Annuler</button>
+                <button id="confirmOkBtn" class="generic-modal-btn confirm">Confirmer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modale des Upgrades Permanents -->
+    <div id="upgradesModal" class="upgrades-modal hidden">
+        <div class="upgrades-modal-content">
+            <div class="upgrades-modal-header">
+                <h2>💎 Upgrades Permanents</h2>
+                <p class="upgrades-fragments">Fragments disponibles: <span id="upgradesFragmentsCount">0</span></p>
+            </div>
+            <div class="upgrades-modal-body" id="upgradesGrid">
+                <!-- Les upgrades seront générés dynamiquement ici -->
+            </div>
+            <div class="upgrades-modal-footer">
+                <button id="upgradesCloseBtn" class="upgrades-modal-btn">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script principal (module ES6) -->
+    <script type="module" src="js/game.js"></script>
+</body>
+</html>

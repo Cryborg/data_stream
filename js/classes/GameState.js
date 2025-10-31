@@ -523,13 +523,18 @@ export class GameState {
             this.prestigeCount = data.prestigeCount;
             this.nodesPlaced = data.nodesPlaced || 0;
             this.unlockedModules = data.unlockedModules || [];
-            this.permanentUpgrades = data.permanentUpgrades || {
+
+            // Merge des permanentUpgrades avec valeurs par défaut
+            // Évite les undefined qui causent NaN dans les calculs
+            this.permanentUpgrades = {
                 offlineRate: 0,
                 coreProduction: 0,
                 processorProduction: 0,
                 nodeDiscount: 0,
-                inflationReduction: 0
+                inflationReduction: 0,
+                ...(data.permanentUpgrades || {})
             };
+
             this.gameTime = data.gameTime;
 
             // Recrée les nœuds

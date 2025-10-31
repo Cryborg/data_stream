@@ -23,8 +23,10 @@
 | **◇ Router** | -50% Bandwidth voisins | 15 Data |
 | **◈ Compressor** | -50% pertes sur connexions | 20 Data |
 | **◐ Cache** | +30% production voisins | 25 Data |
-| **◎ Amplifier** | +80% production voisins | 40 Data |
-| **◉ Optimizer** | -40% BW + 25% prod voisins | 30 Data |
+| **◎ Amplifier** | +80% production voisins | 35 Data |
+| **◉ Optimizer** | -40% BW + 25% prod voisins | 100 Data* |
+
+*Nécessite 1 Prestige pour être débloqué
 
 *Note: Les coûts augmentent avec l'inflation (10% par nœud placé, réductible par upgrade)*
 

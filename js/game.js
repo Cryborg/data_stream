@@ -50,22 +50,9 @@ class Game {
     // Initialise les éléments d'UI
     initUI() {
         // Boutons de nœuds
-        const nodeButtons = document.getElementById('nodeButtons');
-        Object.entries(NODE_TYPES).forEach(([key, config]) => {
-            if (key === 'CORE') return; // Pas de bouton pour le Core
-
-            const button = document.createElement('button');
-            button.className = 'node-button';
-            button.innerHTML = `
-                ${config.icon} ${config.name}
-                <span class="cost">${config.cost} Data</span>
-            `;
-            button.style.borderColor = config.color;
-            button.dataset.nodeType = key;
-
-            button.addEventListener('click', () => this.selectNodeType(key));
-            nodeButtons.appendChild(button);
-        });
+        this.updateNodeButtons();
+        // Boutons de prestige (anciens modules - désactivés pour l'instant)
+        // On garde le code pour compatibilité future
 
         // Boutons de prestige
         const prestigeButtons = document.getElementById('prestigeModules');
@@ -288,6 +275,33 @@ class Game {
         }
     }
 
+    // Met à jour les boutons de nœuds (selon prestige)
+    updateNodeButtons() {
+        const nodeButtons = document.getElementById('nodeButtons');
+        nodeButtons.innerHTML = ''; // Vide les boutons existants
+
+        Object.entries(NODE_TYPES).forEach(([key, config]) => {
+            if (key === 'CORE') return; // Pas de bouton pour le Core
+
+            // Vérifie si le nœud nécessite un prestige
+            if (config.requiresPrestige && this.gameState.prestigeCount < config.requiresPrestige) {
+                return; // Pas encore débloqué
+            }
+
+            const button = document.createElement('button');
+            button.className = 'node-button';
+            button.innerHTML = `
+                ${config.icon} ${config.name}
+                <span class="cost">${config.cost} Data</span>
+            `;
+            button.style.borderColor = config.color;
+            button.dataset.nodeType = key;
+
+            button.addEventListener('click', () => this.selectNodeType(key));
+            nodeButtons.appendChild(button);
+        });
+    }
+
     // Place un nœud
     placeNode(x, y) {
         const result = this.gameState.addNode(this.gameState.selectedNodeType, x, y);
@@ -349,6 +363,8 @@ class Game {
         if (result.success) {
             this.hidePrestigeModal();
             this.showMessage(result.message);
+            // Met à jour les boutons de nœuds (débloque potentiellement de nouveaux types)
+            this.updateNodeButtons();
         } else {
             this.hidePrestigeModal();
             this.showMessage(result.message);
@@ -374,6 +390,9 @@ class Game {
     loadGame() {
         const result = this.gameState.load();
         if (result.success) {
+            // Met à jour les boutons de nœuds selon le prestige
+            this.updateNodeButtons();
+
             // Si gains offline, affiche une modale
             if (result.offlineGains && result.offlineGains > 0) {
                 this.showAlert(

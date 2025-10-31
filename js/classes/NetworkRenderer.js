@@ -39,17 +39,9 @@ export class NetworkRenderer {
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
-    // Dessine le fond avec étoiles
+    // Dessine le fond avec grille
     drawBackground() {
-        // Étoiles
-        this.stars.forEach(star => {
-            this.ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
-            this.ctx.beginPath();
-            this.ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
-            this.ctx.fill();
-        });
-
-        // Grille subtile (optionnelle)
+        // Grille uniquement (étoiles supprimées pour meilleure lisibilité)
         this.drawGrid();
     }
 

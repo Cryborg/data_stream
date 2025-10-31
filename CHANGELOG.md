@@ -1,5 +1,28 @@
 # Changelog - Data Stream
 
+## [1.2.0] - Session 3 (Grille de placement)
+
+### ✨ Nouvelles Fonctionnalités
+- **Système de Grille**
+  - Placement automatique sur intersections (50×50px)
+  - Fonction `snapToGrid()` pour alignement parfait
+  - Grille visible avec lignes et points blancs
+  - Preview améliorée : carré vert/rouge + aperçu du nœud
+  - Core initialisé sur la grille
+
+### 🔧 Améliorations
+- Preview toujours visible (même si placement impossible)
+- Indicateur visuel clair : carré de grille coloré
+- Distances alignées sur la grille (50px = 1 case, 200px = 4 cases)
+- Organisation visuelle plus claire et structurée
+
+### 🐛 Corrections
+- Fix bug NaN dans les coûts des nœuds après placement
+- Suppression du script arcade-theme-integration.js
+- Implémentation du filtre `requiresPrestige` pour débloquer Optimizer
+
+---
+
 ## [1.1.0] - Session 2 (Nuit)
 
 ### ✨ Nouvelles Fonctionnalités

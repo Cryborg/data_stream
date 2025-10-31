@@ -4,7 +4,7 @@
 import { CONFIG, NODE_TYPES } from '../config.js';
 import { Node } from './Node.js';
 import { Connection } from './Connection.js';
-import { calculateDistance, isHubNode, canNodesConnect, CONSTANTS } from '../utils.js';
+import { calculateDistance, isHubNode, canNodesConnect, snapToGrid, CONSTANTS } from '../utils.js';
 
 export class GameState {
     constructor() {
@@ -51,9 +51,11 @@ export class GameState {
 
     // Initialise le nœud Core
     initializeCore() {
-        const coreX = CONFIG.CANVAS_WIDTH / 2;
-        const coreY = CONFIG.CANVAS_HEIGHT / 2;
-        const core = new Node('CORE', coreX, coreY);
+        const centerX = CONFIG.CANVAS_WIDTH / 2;
+        const centerY = CONFIG.CANVAS_HEIGHT / 2;
+        // Snap le Core au centre de la grille
+        const snapped = snapToGrid(centerX, centerY, CONSTANTS.GRID_SIZE);
+        const core = new Node('CORE', snapped.x, snapped.y);
         // Applique les upgrades au Core
         this.applyUpgradesToNode(core);
         this.nodes.push(core);

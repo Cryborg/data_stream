@@ -90,10 +90,25 @@ export function lerp(a, b, t) {
     return a + (b - a) * t;
 }
 
+/**
+ * Snap une position à la grille la plus proche
+ * @param {number} x - Position X
+ * @param {number} y - Position Y
+ * @param {number} gridSize - Taille de la grille (défaut: 50)
+ * @returns {Object} Position snappée {x, y}
+ */
+export function snapToGrid(x, y, gridSize = 50) {
+    return {
+        x: Math.round(x / gridSize) * gridSize,
+        y: Math.round(y / gridSize) * gridSize
+    };
+}
+
 // Constantes de configuration (extraites pour éviter magic numbers)
 export const CONSTANTS = {
-    MAX_CONNECTION_DISTANCE: 200,  // Distance max pour auto-connexion
-    MIN_NODE_DISTANCE: 50,          // Distance min entre nœuds
+    GRID_SIZE: 50,                  // Taille de la grille de placement
+    MAX_CONNECTION_DISTANCE: 200,   // Distance max pour auto-connexion (4 cases)
+    MIN_NODE_DISTANCE: 50,          // Distance min entre nœuds (1 case)
     MAX_CONNECTIONS_PER_NODE: 3,    // Max de connexions auto
     OFFLINE_MIN_TIME: 60000,        // 1 minute minimum pour gains offline
     AUTOSAVE_INTERVAL: 30000,       // 30 secondes entre auto-saves

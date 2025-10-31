@@ -58,14 +58,21 @@ gains = production/s × temps × (0.25 + upgrades × 0.05)
 - Base : 25%
 - Upgrade : +5% par niveau (max 10)
 
-### 3. Règles de Connexion (IMPORTANT)
+### 3. Système de Grille
+- **Grille de placement** : 50x50px
+- Les nœuds se placent **uniquement sur les intersections**
+- Snap automatique : `snapToGrid(x, y, gridSize)`
+- Preview visuelle : carré vert (placement OK) ou rouge (impossible)
+- Grille visible : lignes + points blancs aux intersections
+
+### 4. Règles de Connexion (IMPORTANT)
 - **Seuls CORE et PROCESSOR** peuvent se connecter à tous types
 - Autres types → **doivent** se connecter à CORE/PROCESSOR
-- Distance auto : 200px
-- Distance min : 50px
+- Distance auto : 200px (4 cases de grille)
+- Distance min : 50px (1 case de grille)
 - Max 3 connexions auto
 
-### 4. Effets Locaux (Nœuds → Voisins)
+### 5. Effets Locaux (Nœuds → Voisins)
 | Nœud | Effet |
 |------|-------|
 | Router | -50% Bandwidth voisins |
@@ -74,7 +81,7 @@ gains = production/s × temps × (0.25 + upgrades × 0.05)
 | Amplifier | +80% production (cher) |
 | Optimizer | -40% BW + 25% prod |
 
-### 5. Prestige
+### 6. Prestige
 - Seuil : 1000 Data
 - Gain : 1 Fragment / 1000 Data
 - Reset : Data, nœuds, inflation, integrity

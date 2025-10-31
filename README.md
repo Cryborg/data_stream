@@ -41,9 +41,11 @@
 ### Comment jouer
 
 1. **Observer** : Regarde ton réseau et identifie les blocages
-2. **Construire** : Place des nœuds pour étendre le réseau
-3. **Connecter** : Clique sur deux nœuds pour créer un flux
-4. **Optimiser** : Gère les pertes et la saturation
+2. **Construire** : Sélectionne un nœud et clique sur la grille pour le placer
+   - Les nœuds se placent automatiquement sur les intersections de la grille (50×50px)
+   - Preview verte = placement possible, rouge = impossible
+3. **Connecter** : Les connexions se créent automatiquement entre nœuds proches (200px max)
+4. **Optimiser** : Gère les pertes et la saturation avec les bons nœuds support
 5. **Évoluer** : Prestige pour débloquer des bonus permanents
 
 ### Upgrades Permanents (Fragments de Conscience)

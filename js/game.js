@@ -5,6 +5,7 @@ import { CONFIG, NODE_TYPES, PRESTIGE_MODULES, PERMANENT_UPGRADES } from './conf
 import { GameState } from './classes/GameState.js';
 import { NetworkRenderer } from './classes/NetworkRenderer.js';
 import { Tutorial } from './classes/Tutorial.js';
+import { snapToGrid, CONSTANTS } from './utils.js';
 
 class Game {
     constructor() {
@@ -20,6 +21,8 @@ class Game {
         // Input
         this.mouseX = 0;
         this.mouseY = 0;
+        this.snappedMouseX = 0;
+        this.snappedMouseY = 0;
 
         // Game loop
         this.lastUpdate = Date.now();
@@ -113,18 +116,20 @@ class Game {
         this.mouseX = e.clientX - rect.left;
         this.mouseY = e.clientY - rect.top;
 
-        // Met à jour le nœud survolé
+        // Calcule la position snappée à la grille
+        const snapped = snapToGrid(this.mouseX, this.mouseY, CONSTANTS.GRID_SIZE);
+        this.snappedMouseX = snapped.x;
+        this.snappedMouseY = snapped.y;
+
+        // Met à jour le nœud survolé (utilise position réelle pour détecter survol)
         this.renderer.updateHoveredNode(this.gameState.nodes, this.mouseX, this.mouseY);
     }
 
     handleClick(e) {
-        const rect = this.canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
         // Mode placement de nœud
         if (this.gameState.selectedNodeType) {
-            this.placeNode(x, y);
+            // Utilise la position snappée pour le placement
+            this.placeNode(this.snappedMouseX, this.snappedMouseY);
             return;
         }
     }
@@ -641,8 +646,8 @@ class Game {
         // Met à jour l'UI
         this.updateUI();
 
-        // Rendu
-        this.renderer.render(this.gameState, this.mouseX, this.mouseY);
+        // Rendu (utilise position snappée pour la preview de placement)
+        this.renderer.render(this.gameState, this.snappedMouseX, this.snappedMouseY);
 
         // Auto-save toutes les 30 secondes
         if (Math.floor(this.gameState.gameTime / 30000) > this.lastAutoSave) {

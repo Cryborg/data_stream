@@ -55,11 +55,12 @@ export class NetworkRenderer {
 
     // Dessine une grille de fond
     drawGrid() {
-        this.ctx.strokeStyle = CONFIG.COLORS.GRID;
-        this.ctx.lineWidth = 0.5;
-        this.ctx.globalAlpha = 0.15;
+        const gridSize = CONSTANTS.GRID_SIZE;
 
-        const gridSize = 50;
+        // Lignes de grille
+        this.ctx.strokeStyle = CONFIG.COLORS.GRID;
+        this.ctx.lineWidth = 1;
+        this.ctx.globalAlpha = 0.25;
 
         // Lignes verticales
         for (let x = 0; x < CONFIG.CANVAS_WIDTH; x += gridSize) {
@@ -75,6 +76,18 @@ export class NetworkRenderer {
             this.ctx.moveTo(0, y);
             this.ctx.lineTo(CONFIG.CANVAS_WIDTH, y);
             this.ctx.stroke();
+        }
+
+        // Points aux intersections
+        this.ctx.fillStyle = '#ffffff';
+        this.ctx.globalAlpha = 0.3;
+
+        for (let x = 0; x <= CONFIG.CANVAS_WIDTH; x += gridSize) {
+            for (let y = 0; y <= CONFIG.CANVAS_HEIGHT; y += gridSize) {
+                this.ctx.beginPath();
+                this.ctx.arc(x, y, 2, 0, Math.PI * 2);
+                this.ctx.fill();
+            }
         }
 
         this.ctx.globalAlpha = 1;
@@ -225,10 +238,17 @@ export class NetworkRenderer {
     drawPreviewNode(x, y, nodeType, canPlace) {
         const config = NODE_TYPES[nodeType];
 
-        this.ctx.globalAlpha = 0.5;
+        // Indicateur de grille (carré autour de la position snappée)
+        this.ctx.strokeStyle = canPlace ? '#00ff88' : '#ff4444';
+        this.ctx.lineWidth = 2;
+        this.ctx.globalAlpha = 0.6;
+        this.ctx.setLineDash([]);
+
+        const halfGrid = CONSTANTS.GRID_SIZE / 2;
+        this.ctx.strokeRect(x - halfGrid, y - halfGrid, CONSTANTS.GRID_SIZE, CONSTANTS.GRID_SIZE);
 
         // Cercle de placement
-        this.ctx.strokeStyle = canPlace ? '#00ff00' : '#ff0000';
+        this.ctx.globalAlpha = 0.5;
         this.ctx.lineWidth = 2;
         this.ctx.setLineDash([5, 5]);
 
@@ -238,11 +258,20 @@ export class NetworkRenderer {
 
         this.ctx.setLineDash([]);
 
-        // Zone d'influence
-        this.ctx.strokeStyle = config.color + '33';
+        // Preview du nœud lui-même
+        this.ctx.fillStyle = config.color;
+        this.ctx.globalAlpha = 0.4;
         this.ctx.beginPath();
-        this.ctx.arc(x, y, 50, 0, Math.PI * 2);
-        this.ctx.stroke();
+        this.ctx.arc(x, y, CONFIG.NODE_RADIUS, 0, Math.PI * 2);
+        this.ctx.fill();
+
+        // Icône du nœud
+        this.ctx.fillStyle = '#ffffff';
+        this.ctx.globalAlpha = 0.7;
+        this.ctx.font = `${CONFIG.NODE_RADIUS}px sans-serif`;
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText(config.icon, x, y);
 
         this.ctx.globalAlpha = 1;
     }
@@ -277,10 +306,8 @@ export class NetworkRenderer {
         // Prévisualisation de placement
         if (gameState.selectedNodeType && mouseX && mouseY) {
             const canPlace = this.checkCanPlace(gameState, mouseX, mouseY);
-            // N'affiche l'aperçu que si le placement est possible
-            if (canPlace) {
-                this.drawPreviewNode(mouseX, mouseY, gameState.selectedNodeType, canPlace);
-            }
+            // Affiche toujours l'aperçu (vert si possible, rouge sinon)
+            this.drawPreviewNode(mouseX, mouseY, gameState.selectedNodeType, canPlace);
         }
     }
 

@@ -80,12 +80,20 @@ User Input → Game → GameState → Update Logic
 
 ## 🎮 Systèmes de Jeu
 
-### 1. Réseau de Nœuds
-- **Core** : Nœud central unique (génère 2 Data/s)
+### 1. Système de Grille
+- **Taille** : 50×50 pixels
+- **Placement** : Uniquement sur les intersections (snap automatique)
+- **Fonction** : `snapToGrid(x, y, gridSize)` pour alignement
+- **Visuel** : Lignes de grille + points blancs aux intersections
+- **Preview** : Carré vert (placement OK) ou rouge (impossible) + aperçu du nœud
+
+### 2. Réseau de Nœuds
+- **Core** : Nœud central unique (génère 2 Data/s), placé au centre de la grille
 - **Processors** : Hubs de connexion (génèrent 6 Data/s)
 - **Support** : Router, Cache, Compressor, Amplifier, Optimizer
+- **Déblocage** : Optimizer nécessite 1 Prestige minimum
 
-### 2. Effets Locaux
+### 3. Effets Locaux
 Les nœuds affectent leurs voisins **directement connectés** :
 - Router → -50% Bandwidth des voisins
 - Cache → +30% production des voisins
@@ -93,27 +101,27 @@ Les nœuds affectent leurs voisins **directement connectés** :
 - Amplifier → +80% production (coûte cher)
 - Optimizer → -40% Bandwidth + 25% production
 
-### 3. Règles de Connexion
+### 4. Règles de Connexion
 - Connexions automatiques dans un rayon de 200px
 - **Seuls CORE et PROCESSOR peuvent se connecter à tout**
 - Les autres types doivent se connecter à un PROCESSOR/CORE
 - Max 3 connexions par nœud
 
-### 4. Système d'Inflation
+### 5. Système d'Inflation
 **Formule:** `coût = baseCost × (1 - rabais) × (1 + inflation)^nodesPlaced`
 
 - Inflation de base : 10% par nœud placé
 - Réductible via upgrade "Contrôle d'Inflation"
 - Réinitialisé au Prestige ou crash
 
-### 5. Gains Offline
+### 6. Gains Offline
 **Formule:** `gains = production/s × temps × tauxOffline`
 
 - Taux de base : 25%
 - Améliorable via upgrade (+5% par niveau)
 - Minimum 1 minute offline
 
-### 6. Prestige
+### 7. Prestige
 - Seuil : 1000 Data
 - Récompense : 1 Fragment par 1000 Data
 - Réinitialise : Data, nœuds, inflation, integrity
